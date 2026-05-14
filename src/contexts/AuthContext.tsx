@@ -1,7 +1,7 @@
-import type { ReactNode } from "react"
+import { createContext, type ReactNode, useState } from "react"
 import type UsuarioLogin from "../models/UsuarioLogin"
-import React, { useState } from "react"
 import { login } from "../services/Service"
+import { ToastAlerta } from "../utils/ToastAlerta"
 
 interface AuthContextProps {
     usuario: UsuarioLogin
@@ -14,9 +14,7 @@ interface AuthProviderProps {
     children: ReactNode
 }
 
-export const AuthContext = React.createContext<AuthContextProps>(
-    {} as AuthContextProps
-)
+export const AuthContext = createContext({} as AuthContextProps)
 
 export function AuthProvider({ children }: AuthProviderProps) {
 
@@ -33,14 +31,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function handleLogin(usuarioLogin: UsuarioLogin) {
         setIsLoading(true)
-
         try {
             await login(`/usuarios/logar`, usuarioLogin, setUsuario)
-            alert("O Usuário foi autenticado com sucesso!")
+            ToastAlerta("Usuário foi autenticado com sucesso!", "sucesso")
         } catch (error) {
-            alert("Os Dados do usuário estão inconsistentes!")
+            ToastAlerta("Os dados do Usuário estão inconsistentes!", "erro")
         }
-
         setIsLoading(false)
     }
 
@@ -56,9 +52,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     return (
-        <AuthContext.Provider
-            value={{ usuario, handleLogout, handleLogin, isLoading }}
-        >
+        <AuthContext.Provider value={{ usuario, handleLogin, handleLogout, isLoading }}>
             {children}
         </AuthContext.Provider>
     )
